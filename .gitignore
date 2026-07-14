@@ -3,4 +3,5 @@
 *.o
 sgmr
 SGMR
-*.pdf
+PARCIAL*.pdf
+*.docx
