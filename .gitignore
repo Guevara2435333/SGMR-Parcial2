@@ -1,0 +1,6 @@
+.venv/
+.tools/
+*.o
+sgmr
+SGMR
+*.pdf
