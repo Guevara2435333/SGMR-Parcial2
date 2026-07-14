@@ -154,18 +154,127 @@ void Controlador::verMisiones() const {
 }
 
 void Controlador::registrarRecurso() {
-    // Pendiente: alta interactiva de recursos desde el menu
-    std::cout << "Registro de recursos: pendiente de implementar." << std::endl;
+    int tipo;
+    std::string nombre;
+    std::string placaOEspecialidad;
+    int capacidad = 0;
+
+    std::cout << "\nTipo de recurso:" << std::endl;
+    std::cout << "1. Ambulancia" << std::endl;
+    std::cout << "2. Helicoptero" << std::endl;
+    std::cout << "3. Medico" << std::endl;
+    std::cout << "4. Rescatista" << std::endl;
+    std::cout << "Opcion: ";
+    std::cin >> tipo;
+    std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+
+    if (tipo < 1 || tipo > 4) {
+        std::cout << "Tipo invalido." << std::endl;
+        return;
+    }
+
+    std::cout << "Nombre: ";
+    std::getline(std::cin, nombre);
+
+    if (tipo == 1 || tipo == 2) {
+        std::cout << "Placa/Matricula: ";
+        std::getline(std::cin, placaOEspecialidad);
+        std::cout << "Capacidad: ";
+        std::cin >> capacidad;
+        std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+    } else {
+        std::cout << "Especialidad: ";
+        std::getline(std::cin, placaOEspecialidad);
+    }
+
+    if (cantidadRecursos >= capacidadRecursos) {
+        redimensionarInventario();
+    }
+
+    Recurso* nuevo = nullptr;
+    switch (tipo) {
+        case 1:
+            nuevo = new Ambulancia(siguienteIdRecurso++, nombre, placaOEspecialidad, capacidad);
+            break;
+        case 2:
+            nuevo = new Helicoptero(siguienteIdRecurso++, nombre, placaOEspecialidad, capacidad);
+            break;
+        case 3:
+            nuevo = new Medico(siguienteIdRecurso++, nombre, placaOEspecialidad);
+            break;
+        case 4:
+            nuevo = new Rescatista(siguienteIdRecurso++, nombre, placaOEspecialidad);
+            break;
+    }
+
+    inventario[cantidadRecursos++] = nuevo;
+    std::cout << "Recurso registrado con ID " << nuevo->getId() << "." << std::endl;
 }
 
 void Controlador::crearMision() {
-    // Pendiente: crear misiones nuevas desde el menu
-    std::cout << "Crear mision: pendiente de implementar." << std::endl;
+    std::string nombre;
+    std::string ubicacion;
+
+    std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+    std::cout << "Nombre de la mision: ";
+    std::getline(std::cin, nombre);
+    std::cout << "Ubicacion: ";
+    std::getline(std::cin, ubicacion);
+
+    if (cantidadMisiones >= capacidadMisiones) {
+        redimensionarMisiones();
+    }
+
+    Mision* nueva = new Mision(siguienteIdMision++, nombre, ubicacion);
+    misiones[cantidadMisiones++] = nueva;
+    std::cout << "Mision creada con ID " << nueva->getId() << "." << std::endl;
 }
 
 void Controlador::asignarRecursoAMision() {
-    // Pendiente: asignacion manual recurso -> mision
-    std::cout << "Asignar recurso a mision: pendiente de implementar." << std::endl;
+    int idMision;
+    int idRecurso;
+
+    std::cout << "\nMisiones disponibles:" << std::endl;
+    verMisiones();
+    std::cout << "ID de la mision: ";
+    std::cin >> idMision;
+
+    Mision* mision = buscarMisionPorId(idMision);
+    if (mision == nullptr) {
+        std::cout << "Mision no encontrada." << std::endl;
+        return;
+    }
+
+    std::cout << "\nRecursos disponibles:" << std::endl;
+    bool hayDisponibles = false;
+    for (int i = 0; i < cantidadRecursos; i++) {
+        if (inventario[i] != nullptr && inventario[i]->getDisponible()) {
+            inventario[i]->mostrarInfo();
+            hayDisponibles = true;
+        }
+    }
+
+    if (!hayDisponibles) {
+        std::cout << "No hay recursos disponibles para asignar." << std::endl;
+        return;
+    }
+
+    std::cout << "ID del recurso: ";
+    std::cin >> idRecurso;
+
+    Recurso* recurso = buscarRecursoPorId(idRecurso);
+    if (recurso == nullptr) {
+        std::cout << "Recurso no encontrado." << std::endl;
+        return;
+    }
+
+    if (!recurso->getDisponible()) {
+        std::cout << "El recurso ya esta asignado a otra mision." << std::endl;
+        return;
+    }
+
+    mision->asignarRecurso(recurso);
+    std::cout << "Recurso asignado correctamente a la mision." << std::endl;
 }
 
 void Controlador::ejecutarMision() {
