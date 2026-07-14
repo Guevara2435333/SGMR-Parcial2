@@ -9,8 +9,11 @@ private:
     int id;
     std::string nombre;
     std::string ubicacion;
-    // Recursos asignados: se implementara despues
+    Recurso** recursosAsignados;
     int cantidadRecursos;
+    int capacidadRecursos;
+
+    void redimensionarRecursos();
 
 public:
     Mision(int id, const std::string& nombre, const std::string& ubicacion);
